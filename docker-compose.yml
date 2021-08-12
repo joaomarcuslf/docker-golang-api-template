@@ -1,0 +1,39 @@
+version: "3.7"
+
+services:
+  api:
+    build: ./api
+    command: air -c .air.toml
+    volumes:
+      - ./api/:/usr/app
+      - ./api/:/go/src/golang_api
+      - ./api/:/usr/local/go/src/golang_api
+    ports:
+      - 5000:5000
+    env_file:
+      - ./.env
+    links:
+      - mongodb
+    environment:
+      PORT: 5000
+    depends_on:
+      - mongodb
+    networks:
+      - mongodb-compose-network
+  mongodb:
+    image: mongo:latest
+    env_file:
+      - ./.env
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data_container:/data/db
+    networks:
+      - mongodb-compose-network
+
+volumes:
+  mongodb_data_container:
+
+networks:
+  mongodb-compose-network:
+      driver: bridge
